@@ -1,4 +1,6 @@
 class PostsController < ApplicationController
+  before_action :require_login, except: %i[index]
+
   def new
     @post = Post.new
   end
@@ -13,11 +15,21 @@ class PostsController < ApplicationController
     end
   end
 
-  def index; end
+  def index
+    @posts = Post.all
+  end
 
   private
 
   def post_params
     params.require(:post).permit(:title, :body)
+  end
+
+  def require_login
+    return if logged_in?
+
+    flash[:error] = 'You must be logged in to access this section'
+
+    redirect_to new_login_url
   end
 end
